@@ -16,7 +16,7 @@
 
 
 //第二次GitHub提交测试
-
+uint16_t github; //test
 //测试变量
 uint32_t  getNumber;
 
