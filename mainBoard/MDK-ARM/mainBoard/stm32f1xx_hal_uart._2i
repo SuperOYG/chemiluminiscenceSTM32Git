@@ -1,0 +1,6 @@
+--c99 -c --cpu Cortex-M3 -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../User
+-I.\RTE\_mainBoard
+-ID:\SoftWare\Work\Keil5\AppDate\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+-ID:\SoftWare\Work\Keil5\AppDate\Keil\STM32F1xx_DFP\1.0.5\Device\Include
+-D__UVISION_VERSION="526" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB
+-o mainboard\stm32f1xx_hal_uart.o --omf_browse mainboard\stm32f1xx_hal_uart.crf --depend mainboard\stm32f1xx_hal_uart.d --feedback "mainBoard\mainBoard.fed" "../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c"
