@@ -184,23 +184,12 @@ void init()
 		moter1_int(200);
     printf("system init");
     HAL_Delay(10000);//系统晚启动10s
-    Read_equipment_parament(); // 发送子板电机参数。
+//    Read_equipment_parament(); // 发送子板电机参数。
+	
+	
     for (int i = 1; i < 9; i++) {
         CmdFlagBuf[i] = 0x00;
     }
-//    CmdFlagBuf[3]=0x00;
-//		//获取机器开机状态。
-//		uint1_stateFlag=I2C_getByte(Unit1_Status_addres);
-//		uint2_stateFlag=I2C_getByte(Unit2_Status_addres);
-//		uint3_stateFlag=I2C_getByte(Unit3_Status_addres);
-	
-//		uint8_t buf1[8] = {0x06, uint1_stateFlag, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-//			CAN_senddata(&hcan, buf1, 0x01);
-
-//		uint8_t buf2[8] = {0x06, uint2_stateFlag, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-//			CAN_senddata(&hcan, buf2, 0x02);
-//		uint8_t buf3[8] = {0x06, uint3_stateFlag, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-//			CAN_senddata(&hcan, buf3, 0x03);
 }
 
 
@@ -360,7 +349,7 @@ void  getPraVue()
         Read_equipment_parament();
         break;
 
-    case 0x05: //获取子控制板 命令执行状态：
+    case 0x05: //获取子控制板 命令执行状态： 主板查询子板对应的引脚之后,
 
         //帧头
         Usart2_SendByte(0xEE);
@@ -547,20 +536,7 @@ void getCanData() {
 			HAL_Delay(50);
 		}
 	}else { //温度数据
-//			uint32_t params = (R3 - 0x30) * 10000 + (R4 - 0x30) * 1000 + (R5 - 0x30) * 100 + (R6 - 0x30) * 10 + (R7 - 0x30);
-//		  buf[0]=0xEE;
-//			buf[1]=0x02; //指令码
-//			buf[2]=subId; //第几组
-//			buf[10]=0xFF;
-//			buf[11]=0x0D;
-//			buf[12]=0x0A;
-//			
-//			for(int i=0;i<9;i++){
-//				buf[i+2]=CanRXmessage[i];
-//			}
-//				HAL_Delay(50);
-//			 HAL_UART_Transmit(&huart2,buf,13,1000);
-//			HAL_Delay(200);
+
 	}
 	
 }

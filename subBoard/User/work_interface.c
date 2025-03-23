@@ -285,7 +285,7 @@ void moter3_reset()
         moter3_now = 0;
     }
 }
-
+void init_PA0();
 /**********************************************************
  * @brief 单元组的电机3轴复位
  * @author  hang
@@ -333,28 +333,31 @@ void init()
     }
     moter3_now = 0; //这是把触碰到开关后的向上再移动400的位置，作为运动坐标原点。
     moter1_int(200);
-    PidAndErrorInit();
-    Start_TempCon();  //开启温控
+//    PidAndErrorInit();
+//    Start_TempCon();  //开启温控
 	
 	//初始化滑道数组：
-    int n = (slipAddress[1] - slipAddress[10]) / 9;
-    for (int i = 2; i < 10; i++)
-    {
-        slipAddress[i] = slipAddress[1] - n * (i - 1);
-    }	
-	if(Frame_header==0x01){
+					int n = (slipAddress[1] - slipAddress[10]) / 9;
+					for (int i = 2; i < 10; i++)
+					{
+							slipAddress[i] = slipAddress[1] - n * (i - 1);
+					}	
+				if(Frame_header==0x01){
+				
+					
+				}else  if(Frame_header==0x02)
+				{
+					for(int i=0;i<15;i++){			
+						slipAddress[i]=slipAddress[i]-115;
+					}
+				}else if(Frame_header==0x03){
+					for(int i=0;i<15;i++){			
+						slipAddress[i]=slipAddress[i]-110;
+					}
+				}
 	
-		
-	}else  if(Frame_header==0x02)
-	{
-		for(int i=0;i<15;i++){			
-			slipAddress[i]=slipAddress[i]-115;
-		}
-	}else if(Frame_header==0x03){
-		for(int i=0;i<15;i++){			
-			slipAddress[i]=slipAddress[i]-110;
-		}
-	}
+	init_PA0();//初始化阀门开关。
+	
 }
 
 /**
@@ -475,7 +478,6 @@ void aspirationTest(u16 height, u8 channel1, u8 channel2)
 *   @author Hang
 *   @date: 2023-05-20
 */
-
 void ShockTest(u32 height1, u32 height2, u32 times)
 {	    
 	
@@ -703,7 +705,7 @@ void  getPraVue()
         case 0x03:
 
             break;
-        case 0x04: //吸液单元测试：
+        case 0x04: //吸液单元测试：          这个就是这次要实现的功能函数。2025年3月23日21:12:03
             if (R2 == 0x01) //吸液高度
             {
                 heighOfLiquid = params;
@@ -760,13 +762,15 @@ void  getPraVue()
         case 01:
             if (R2 == 0x01) //温控开启
             {
-                PidAndErrorInit();
-                Start_TempCon();
+//                PidAndErrorInit();
+//                Start_TempCon();
 //              PidAndErrorInit();
+								HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0,GPIO_PIN_SET);
             }
             else if (R2 == 0x02)
             {
-                Stop_TempCon();
+							  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0,GPIO_PIN_RESET);   
+//                Stop_TempCon();
             }
             break;
         case 02:
@@ -1225,5 +1229,26 @@ void ChangeGPIOMode(u8 flag, u8 moterId)
         }
     }
 }
+
+
+/**********************************************************
+ * @brief   将温控的PWM输出引脚重新设置为 普通IO 输出模式，控制MOS通断
+ * @param
+ * @author  hang
+ * @date  
+ **********************************************************/
+void init_PA0(){
+		      GPIO_InitTypeDef GPIO_InitStruct;
+            __HAL_RCC_GPIOB_CLK_ENABLE();
+            GPIO_InitStruct.Pin = GPIO_PIN_0;
+            GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+            HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+
+
+
 
 
