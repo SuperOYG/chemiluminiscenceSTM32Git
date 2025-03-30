@@ -103,8 +103,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start_IT(&htim2);
 //	HAL_UART_Receive_IT(&huart1, (uint8_t *)RecieveBuffer, 1); //启动串口1接收中断。
-	HAL_UART_Receive_IT(&huart2, (uint8_t *)RecieveBuffer, 1); //启动串口2接收中断。
-	HAL_UART_Receive_IT(&huart3, (uint8_t *)RecieveBuffer, 1); //启动串口2接收中断。
+//	HAL_UART_Receive_IT(&huart2, (uint8_t *)RecieveBuffer, 1); //启动串口2接收中断。
+//	HAL_UART_Receive_IT(&huart3, (uint8_t *)RecieveBuffer, 1); //启动串口2接收中断。
 	
 	init();
   /* USER CODE END 2 */

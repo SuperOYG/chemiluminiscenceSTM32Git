@@ -16,6 +16,7 @@
 void test(void);
 void init(void);
 void getTemp(void);
+void init_PA0();//初始化阀门开关。
 
 #endif
 

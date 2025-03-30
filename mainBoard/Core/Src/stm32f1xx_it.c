@@ -320,86 +320,142 @@ void USART3_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 uint8_t CurUartNum=2;
 
-uint8_t  RecieveBuffer[1]={0};//暂存接收到的字符
-uint8_t  RxLine=0; //记录接收数据长度
-uint8_t  RxStart=0;   //记录数据开始&结束标志位
+//uint8_t  RecieveBuffer[1]={0};//暂存接收到的字符
+//uint8_t  RxLine=0; //记录接收数据长度
+//uint8_t  RxStart=0;   //记录数据开始&结束标志位
 uint8_t  Rx_end=0;  //指令接收完成标志位
-uint8_t  errorBuffer[]="\r\nerror\r\n"; //错误提示
-uint8_t  rxbuf[50];//收到的数据存放处
-uint8_t  UART_Code[7]; //条码值
+//uint8_t  errorBuffer[]="\r\nerror\r\n"; //错误提示
+//uint8_t  rxbuf[50];//收到的数据存放处
+//uint8_t  UART_Code[7]; //条码值
 
-extern uint8_t testStatus;
-/**
- * @brief 不定长数据接收
- * @param  串口号
- * @retval void
- * @author smart_mode
- * @Time 2021年11月21日
-*/
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	UNUSED(huart);
-	if(huart==&huart2){  //串口2 接收
-		if (RecieveBuffer[0]==0xEE) // 判断帧头是否正确
-	{
-		CurUartNum=2;
-		RxStart=1;   //接收开始
-		RxLine=0;    //接收初始数值地址位为0;
-	}
-	if(RxStart==1){
-	 if(RecieveBuffer[0]!=0xFF){
-			rxbuf[RxLine++]=RecieveBuffer[0];
-	 }else{
-			rxbuf[RxLine]=RecieveBuffer[0];
-			if(rxbuf[1]==0xB2&&rxbuf[2]==0x01){
-				testStatus=1;
-			}if(rxbuf[1]==0xB2&&rxbuf[2]==0x02){
-				testStatus=0;
-			}
-			RxStart=0;  //接收结束
-			Rx_end=1;    //接收完成
-	 }
-	}
-	RecieveBuffer[0]=0;
-	HAL_UART_Receive_IT(&huart2, (uint8_t *)RecieveBuffer, 1); //再次打开中断
-	}
-	else if(huart==&huart3){  //串口3 接收
-		if (RecieveBuffer[0]==0xEE) // 判断帧头是否正确
-	{
-		CurUartNum=3;
-		RxStart=1;   //接收开始
-		RxLine=0;    //接收初始数值地址位为0;
-	}
-	if(RxStart==1){
-	 if(RecieveBuffer[0]!=0xFF){
-			rxbuf[RxLine++]=RecieveBuffer[0];
-	 }else{
-			rxbuf[RxLine]=RecieveBuffer[0];
-			RxStart=0;  //接收结束
-			Rx_end=1;    //接收完成
-	 }
-	}
-	RecieveBuffer[0]=0;
-	HAL_UART_Receive_IT(&huart3, (uint8_t *)RecieveBuffer, 1); //再次打开中断
-	}
-//	else if(huart==&huart2){
-//		uint8_t data;
-//		data=RecieveBuffer[0];
-//		if(data==0x2a){
-//			RxStart=1;
-//			RxLine=1;
-//		}if(RxStart==1)
-//		{
-//			if(data !=0x0D){
-//			UART_Code[RxLine++]=data;  //条码值数值
-//			}else {
-//			RxStart=0;  //接收结束
-//			Rx_end=0;    //接收完成
-//			}
-//		}
-//		HAL_UART_Receive_IT(&huart2, (uint8_t *)RecieveBuffer, 1);//再次打开中断
+//extern uint8_t testStatus;
+///**
+// * @brief 不定长数据接收
+// * @param  串口号
+// * @retval void
+// * @author smart_mode
+// * @Time 2021年11月21日
+//*/
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//	UNUSED(huart);
+//	if(huart==&huart2){  //串口2 接收
+//		if (RecieveBuffer[0]==0xEE) // 判断帧头是否正确
+//	{
+//		CurUartNum=2;
+//		RxStart=1;   //接收开始
+//		RxLine=0;    //接收初始数值地址位为0;
 //	}
+//	if(RxStart==1){
+//	 if(RecieveBuffer[0]!=0xFF){
+//			rxbuf[RxLine++]=RecieveBuffer[0];
+//	 }else{
+//			rxbuf[RxLine]=RecieveBuffer[0];
+//			if(rxbuf[1]==0xB2&&rxbuf[2]==0x01){
+//				testStatus=1;
+//			}if(rxbuf[1]==0xB2&&rxbuf[2]==0x02){
+//				testStatus=0;
+//			}
+//			RxStart=0;  //接收结束
+//			Rx_end=1;    //接收完成
+//	 }
+//	}
+//	RecieveBuffer[0]=0;
+//	HAL_UART_Receive_IT(&huart2, (uint8_t *)RecieveBuffer, 1); //再次打开中断
+//	}
+//	else if(huart==&huart3){  //串口3 接收
+//		if (RecieveBuffer[0]==0xEE) // 判断帧头是否正确
+//	{
+//		CurUartNum=3;
+//		RxStart=1;   //接收开始
+//		RxLine=0;    //接收初始数值地址位为0;
+//	}
+//	if(RxStart==1){
+//	 if(RecieveBuffer[0]!=0xFF){
+//			rxbuf[RxLine++]=RecieveBuffer[0];
+//	 }else{
+//			rxbuf[RxLine]=RecieveBuffer[0];
+//			RxStart=0;  //接收结束
+//			Rx_end=1;    //接收完成
+//	 }
+//	}
+//	RecieveBuffer[0]=0;
+//	HAL_UART_Receive_IT(&huart3, (uint8_t *)RecieveBuffer, 1); //再次打开中断
+//	}
+//}
+
+// 初始化UART2和UART3的实例
+UART_Instance uart2_instance = {0};
+UART_Instance uart3_instance = {0};
+
+//---------------------- 全局变量 ----------------------
+uint8_t RecieveBuffer_UART2[1] = {0};  // UART2单字节接收缓存
+uint8_t RecieveBuffer_UART3[1] = {0};  // UART3单字节接收缓存
+extern uint8_t testStatus;             // 外部状态变量
+
+//---------------------- 函数声明 ----------------------
+void ProcessUARTCommands(UART_Instance *instance);
+
+//====================== 中断接收处理 ======================
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    UART_Instance *instance = NULL;
+    uint8_t *recv_byte = NULL;
+
+    // 确定触发中断的串口
+    if(huart->Instance == USART2) {
+        instance = &uart2_instance;
+        recv_byte = RecieveBuffer_UART2;
+    } 
+    else if(huart->Instance == USART3) {
+        instance = &uart3_instance;
+        recv_byte = RecieveBuffer_UART3;
+    }
+    
+    if(instance != NULL && recv_byte != NULL) {
+        // 状态机处理
+        switch(instance->rxState) {
+            case RX_IDLE:
+                if(*recv_byte == 0xEE) {  // 检测起始字节
+                    instance->rxIndex = 0;
+                    instance->rxBuffer[instance->rxIndex++] = *recv_byte;
+                    instance->rxState = RX_STARTED;
+                }
+                break;
+                
+            case RX_STARTED:
+                instance->rxBuffer[instance->rxIndex++] = *recv_byte;
+                
+                // 检测结束字节或溢出
+                if(*recv_byte == 0xFF) {  // 完整指令
+                    if(instance->queueCount < QUEUE_SIZE) {
+                        // 复制数据到队列
+                        uint8_t q_index = instance->queueTail;
+                        memcpy(instance->cmdQueue[q_index].data, instance->rxBuffer, instance->rxIndex);
+                        instance->cmdQueue[q_index].len = instance->rxIndex;
+                        
+                        // 更新队列指针
+                        instance->queueTail = (instance->queueTail + 1) % QUEUE_SIZE;
+                        instance->queueCount++;
+                    }
+                    instance->rxState = RX_IDLE;
+                } 
+                else if(instance->rxIndex >= MAX_CMD_LEN) {  // 缓冲区溢出
+                    instance->rxState = RX_IDLE;  // 丢弃错误数据
+                }
+                break;
+        }
+        
+        // 重新启动接收（根据串口类型）
+        if(huart->Instance == USART2) {
+            HAL_UART_Receive_IT(&huart2, RecieveBuffer_UART2, 1);
+        } else {
+            HAL_UART_Receive_IT(&huart3, RecieveBuffer_UART3, 1);
+        }
+    }
 }
+
+
+
 
 /**
 *@brief  CAN通讯的中断回调函数：

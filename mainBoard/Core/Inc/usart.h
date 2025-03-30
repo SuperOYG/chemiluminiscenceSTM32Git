@@ -32,6 +32,7 @@ extern "C" {
 #include "stdio.h"
 /* USER CODE END Includes */
 
+#include "string.h"
 extern UART_HandleTypeDef huart1;
 
 extern UART_HandleTypeDef huart2;
@@ -43,6 +44,45 @@ extern uint8_t  RecieveBuffer[1];//暂存接收到的字符
 extern uint8_t  Rx_end;  //指令接收完成标志位
 extern uint8_t  RxLine;  //rxbuf接收的数据长度为:RxLine+1;
 extern uint8_t  rxbuf[50];//收到的数据存放处
+
+
+
+
+
+
+
+#define QUEUE_SIZE         10      // 队列最多存储10条指令
+#define MAX_CMD_LEN        50      // 单条指令最大长度
+
+// 指令队列元素结构体
+typedef struct {
+    uint8_t data[MAX_CMD_LEN];     // 指令数据
+    uint8_t len;                    // 指令长度
+} QueueElement;
+
+// 串口实例管理结构体
+typedef struct {
+    // 接收状态机
+    enum { RX_IDLE, RX_STARTED } rxState;
+    uint8_t rxBuffer[MAX_CMD_LEN];  // 接收缓冲区
+    uint8_t rxIndex;                // 当前接收位置
+    
+    // 环形队列
+    QueueElement cmdQueue[QUEUE_SIZE];
+    uint8_t queueHead;
+    uint8_t queueTail;
+    uint8_t queueCount;
+} UART_Instance;
+
+
+
+
+
+
+
+
+
+
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);

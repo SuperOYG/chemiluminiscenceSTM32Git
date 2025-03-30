@@ -98,7 +98,7 @@ u8 motor2Flag;//电机2复位标志位：
 u8 motor3Flag;//电机2复位标志位:
 
 //出仓电机复位偏差补偿：
-int motor1_ResetParams;
+int motor1_ResetParams=200; //2025年3月24日20:50:37
 //磁棒电机复位偏差补偿：
 int motor2_ResetParams;
 //震荡电机复位偏差补偿：
@@ -131,7 +131,7 @@ u32 speedOfShock = 400; //震荡速度  单位是 r/min(单位时间电机转的圈数);
 
 
 //吸液起始高度
-u16 aspiration_height=7000;
+u16 aspiration_height=8000;
 //切换电机模式：
 void ChangeGPIOMode(u8 flag, u8 moterId);
 
@@ -420,6 +420,7 @@ void aspirationTest(u16 height, u8 channel1, u8 channel2)
 {
     u16 moter1_next;  //出仓
     u16 moter2_next; //磁棒距离
+		aspiration_height=8000;//吸液磁棒初始位置 
 	//1.磁棒到达吸液起始点
     moter2_move(aspiration_height); //移到吸液起始位置，移动到7000步，开始实验。;2023-09-11  调整为6500 。测试是否能吐干净。
     //2.出仓电机：移到取液位：
@@ -428,47 +429,104 @@ void aspirationTest(u16 height, u8 channel1, u8 channel2)
     //3.震荡电机：下移指定距离：
     if (channel1 == 15) //当吸取样本槽
     {
-//		moter3_move(2600);
-//		moter3_move(2390); //0918
 		moter3_move(2450);
     }
     else      //非样本槽：
     {
-//		moter3_move(5400);
-		moter3_move(5400);//0918
+//		moter3_move(5400);//0918
+		moter3_move(4400);//0918
     }
     //4.磁棒上移：吸液
     moter2_next = aspiration_height - height;
     moter2_move(moter2_next);
     //5.震荡电机：复位
     moter3_reset();
-//    //6.磁棒上移：
-//    moter2_next = moter2_next;
-//    moter2_move(moter2_next);
-    //7.出仓电机：吐液位
-    moter1_next = slipAddress[channel2 - 1];
-    moter1_move(moter1_next);
-   //8.磁棒下移：移动8000位置，吐液。
-	if(channel2==1){ //反应仓吐液
-//		moter3_move(4300);
-		moter3_move(4250);
-		moter2_move(9200);
-		aspiration_height=9200;
-		
-//		moter2_move(10500);
-//		aspiration_height=10500;
-	}
-	else
-	{  //移动9000位置，吐液。
-		moter3_move(4900);
-		moter2_move(10500);
-		aspiration_height=10500;
-//		moter2_move(9000);
-//		aspiration_height=9000;
-	}
+//    //6.磁棒上移：吸空气
+    moter2_next = moter2_next-200;
+    moter2_move(moter2_next);
+//    //7.出仓电机：吐液位
+//    moter1_next = slipAddress[channel2 - 1];
+//    moter1_move(moter1_next);
+//   //8.磁棒下移：移动8000位置，吐液。
+//	if(channel2==1){ //反应仓吐液
+//		moter3_move(4250);
+//		moter2_move(8500);
+//		aspiration_height=8500;
+//	}
+//	else
+//	{  //移动9000位置，吐液。
+//		moter3_move(4900);
+//		moter2_move(8500);
+//		aspiration_height=8500;
+//	}
     //9.震荡电机：下降到吐液位置
-	    moter3_reset();//震荡电机复位.
+//	    moter3_reset();//震荡电机复位.
+		moter1_reset(0);
 }
+
+/**********************************************************
+ * @brief   悬停吐液
+ * @param
+ * @author  hang
+ * @date  
+ **********************************************************/
+void aspirationTest_drop(){
+		moter2_move(8500);
+
+}
+
+
+//void aspirationTest(u16 height, u8 channel1, u8 channel2)
+//{
+//    u16 moter1_next;  //出仓
+//    u16 moter2_next; //磁棒距离
+//		aspiration_height=8000;//吸液磁棒初始位置 
+//	//1.磁棒到达吸液起始点
+//    moter2_move(aspiration_height); //移到吸液起始位置，移动到7000步，开始实验。;2023-09-11  调整为6500 。测试是否能吐干净。
+//    //2.出仓电机：移到取液位：
+//    moter1_next = slipAddress[channel1 - 1];
+//    moter1_move(moter1_next);
+//    //3.震荡电机：下移指定距离：
+//    if (channel1 == 15) //当吸取样本槽
+//    {
+//		moter3_move(2450);
+//    }
+//    else      //非样本槽：
+//    {
+////		moter3_move(5400);//0918
+//		moter3_move(4400);//0918
+//    }
+//    //4.磁棒上移：吸液
+//    moter2_next = aspiration_height - height;
+//    moter2_move(moter2_next);
+//    //5.震荡电机：复位
+//    moter3_reset();
+////    //6.磁棒上移：吸空气
+//    moter2_next = moter2_next-200;
+//    moter2_move(moter2_next);
+//    //7.出仓电机：吐液位
+//    moter1_next = slipAddress[channel2 - 1];
+//    moter1_move(moter1_next);
+//   //8.磁棒下移：移动8000位置，吐液。
+//	if(channel2==1){ //反应仓吐液
+//		moter3_move(4250);
+//		moter2_move(8500);
+//		aspiration_height=8500;
+//	}
+//	else
+//	{  //移动9000位置，吐液。
+//		moter3_move(4900);
+//		moter2_move(8500);
+//		aspiration_height=8500;
+//	}
+//    //9.震荡电机：下降到吐液位置
+//	    moter3_reset();//震荡电机复位.
+//}
+
+
+
+
+
 
 /**
 *   @brief: 震荡测试：
@@ -731,7 +789,12 @@ void  getPraVue()
             {
                 heighOfLiquid = params;
                 aspirationTest(heighOfLiquid, channel1OfLiquid, channel2OfLiquid);
-            }
+            }else if(R2==0x07){
+							aspirationTest_drop();
+						
+						}
+						
+						
             break;
         case 0x05: //电机震荡测试：
             if (R2 == 0x02) //设置震荡电机速度
@@ -1245,6 +1308,7 @@ void init_PA0(){
             GPIO_InitStruct.Pull = GPIO_NOPULL;
             GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
             HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+			   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
 }
 
 

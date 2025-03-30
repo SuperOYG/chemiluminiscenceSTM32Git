@@ -176,17 +176,17 @@ void Close_Scanning(void)//关闭条码器
 //函数申明
 void u16ToHexArray(u16 num, u8* hexArray);
 
-
+void UART_Init(void);
 //参数初始化
 void init()
 {
-		moter2_int(200);
-		moter1_int(200);
-    printf("system init");
-    HAL_Delay(10000);//系统晚启动10s
+//		moter2_int(200);
+//		moter1_int(200);
+//    printf("system init");
+//    HAL_Delay(10000);//系统晚启动10s
 //    Read_equipment_parament(); // 发送子板电机参数。
 	
-	
+		UART_Init();
     for (int i = 1; i < 9; i++) {
         CmdFlagBuf[i] = 0x00;
     }
@@ -348,7 +348,6 @@ void  getPraVue()
         }
         Read_equipment_parament();
         break;
-
     case 0x05: //获取子控制板 命令执行状态： 主板查询子板对应的引脚之后,
 
         //帧头
@@ -426,7 +425,7 @@ void receiveCmd()
         CmdFlagBuf[2]=0x01;
         HAL_UART_Transmit(&huart2,CmdFlagBuf,12,1000);   //接收应答
         HAL_Delay(50);
-		HAL_UART_Transmit(&huart2,CmdFlagBuf,12,1000);   //接收应答
+				HAL_UART_Transmit(&huart2,CmdFlagBuf,12,1000);   //接收应答
         HAL_Delay(50);
         R0 = rxbuf[2];
         R1 = rxbuf[3];
@@ -438,8 +437,8 @@ void receiveCmd()
         R7 = rxbuf[9];
         getPraVue();
         CmdFlagBuf[2]=0x02;
-		HAL_Delay(50);
-		HAL_UART_Transmit(&huart2,CmdFlagBuf,12,1000);	//执行应答
+				HAL_Delay(50);
+				HAL_UART_Transmit(&huart2,CmdFlagBuf,12,1000);	//执行应答
         HAL_Delay(50);
     } 
 	else if(rxbuf[1]==0x10) { //清除状态标志位
@@ -481,7 +480,7 @@ void receiveCmd()
             HAL_Delay(50);
             CAN_senddata(&hcan, TextBuffer, 0x01);
         }
-        else if (rxbuf[1] == 0x02)  //发送给2号子板
+        else if (rxbuf[1] == 0x02)  //发送给2号子板      
         {
             if(CmdFlagBuf[5]>250) {
                 CmdFlagBuf[5]=0x00;
@@ -542,15 +541,65 @@ void getCanData() {
 }
 
 
+extern uint8_t RecieveBuffer_UART2[1];  // UART2单字节接收缓存
+extern uint8_t RecieveBuffer_UART3[1] ;  // UART3单字节接收缓存
+extern UART_Instance uart2_instance ;
+extern UART_Instance uart3_instance ;
 
+// 全局定义缓冲区（根据需求可调整作用域）
+uint8_t rxbuf[50];  // 用于存储处理后的指令数据
+uint8_t buf_len = 0; // 实际存储的数据长度
+
+void ProcessUARTCommands(UART_Instance *instance) {
+    if (instance->queueCount == 0) return;
+
+    // 取出队列头部指令
+    uint8_t q_index = instance->queueHead;
+    QueueElement *cmd = &instance->cmdQueue[q_index];
+
+    /* 核心操作：将指令数据复制到全局buf */
+    // 1. 清空旧数据
+    memset(rxbuf, 0, sizeof(rxbuf)); 
+    // 2. 限制拷贝长度（防止溢出）
+    buf_len = (cmd->len <= sizeof(rxbuf)) ? cmd->len : sizeof(rxbuf); 
+    // 3. 执行拷贝
+    memcpy(rxbuf, cmd->data, buf_len); 
+
+    // 示例处理逻辑（基于buf操作）
+    if (buf_len >= 3) {
+        if (rxbuf[1] == 0xB2) {       // 使用buf替代原cmd->data
+            if (rxbuf[2] == 0x01) {   // 数据来源变为全局buf
+                testStatus = 1;
+            } else if (rxbuf[2] == 0x02) {
+                testStatus = 0;
+            }
+        }
+    }
+			receiveCmd(); //解析数据
+    // 更新队列指针
+    instance->queueHead = (instance->queueHead + 1) % QUEUE_SIZE;
+    instance->queueCount--;
+}
+
+void UART_Init(void) {
+    // 启动UART2接收
+    HAL_UART_Receive_IT(&huart2, RecieveBuffer_UART2, 1);
+    // 启动UART3接收
+    HAL_UART_Receive_IT(&huart3, RecieveBuffer_UART3, 1);
+}
 
 
 void test()
 {
+		        // 处理UART2指令
+        ProcessUARTCommands(&uart2_instance);
+        // 处理UART3指令
+        ProcessUARTCommands(&uart3_instance);
+	
     if (Rx_end == 1)
     {
-        receiveCmd();
-        Rx_end = 0;
+//        receiveCmd();
+//        Rx_end = 0;
 //		printf("收到串口指令");
     }
     else if (Rx_end == 2)

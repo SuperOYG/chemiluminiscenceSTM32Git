@@ -103,8 +103,14 @@ int main(void)
 
 	HAL_ADCEx_Calibration_Start(&hadc1);    //AD校准
 	HAL_ADC_Start_IT(&hadc1); //开启ADC中断转换
-
-	init();
+	
+	if(Frame_header==0x02){
+		init();	
+	}else {	
+		init_PA0();
+	
+	}
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
